@@ -1,0 +1,41 @@
+{
+  "name": "notiondb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --config jestconfig.json",
+    "lint": "tslint -p tsconfig.json --config .eslintrc.json",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JorgeArreolaS/NotionDB.git"
+  },
+  "keywords": [],
+  "author": "Jorge Arreola",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JorgeArreolaS/NotionDB/issues"
+  },
+  "homepage": "https://github.com/JorgeArreolaS/NotionDB#readme",
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.5",
+    "prettier": "^2.5.1",
+    "ts-jest": "^27.1.2",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.5.4",
+    "typescript-tslint-plugin": "^1.0.1"
+  },
+  "files": [
+    "lib/**/*"
+  ]
+}
