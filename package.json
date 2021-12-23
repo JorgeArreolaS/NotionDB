@@ -1,7 +1,7 @@
 {
   "name": "notiondb",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tool to handle Notion Databases",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
@@ -18,7 +18,11 @@
     "type": "git",
     "url": "git+https://github.com/JorgeArreolaS/NotionDB.git"
   },
-  "keywords": [],
+  "keywords": [
+    "Notion",
+    "Database",
+    "Typescript"
+  ],
   "author": "Jorge Arreola",
   "license": "ISC",
   "bugs": {
