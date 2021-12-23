@@ -70,7 +70,7 @@ export const NotionParser: <K = undefined>(
     [key: string]: any
   },
 ) => K = (property, props) => {
-  if (typeof property != 'object') return props?.default || undefined
+  if (typeof property !== 'object') return props?.default || undefined
 
   const _type = property.type
   const _default = props?.default || undefined
@@ -85,14 +85,16 @@ export const ParseNotionProps: <T extends Record<string, any>>(
     bases?: Record<string, any>
   },
 ) => T = (NotionProps, config) => {
-  let obj = Object.assign({}, config.default)
+  const obj = Object.assign({}, config.default)
 
-  for (let key in obj) {
-    let item = NotionProps[key]
-    let props: { [key: string]: any } = {}
-    if (config.bases && config.bases[key] != undefined) props.base = config.bases[key]
-    let value = NotionParser(item, { default: obj[key], ...props })
-    if (value != null || value != undefined) obj[key] = value
+  for (const key in obj) {
+    if (obj[key]) {
+      const item = NotionProps[key]
+      const props: { [key: string]: any } = {}
+      if (config.bases && config.bases[key] !== undefined) props.base = config.bases[key]
+      const value = NotionParser(item, { default: obj[key], ...props })
+      if (value !== null || value !== undefined) obj[key] = value
+    }
   }
 
   return obj

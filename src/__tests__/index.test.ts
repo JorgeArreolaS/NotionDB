@@ -1,5 +1,5 @@
-import { NotionDatabase } from '../index'
 import { Tag } from '../parser'
+import { NotionDatabase } from '../index'
 
 test('Test users', async () => {
   require('dotenv').config()
