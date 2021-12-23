@@ -88,7 +88,7 @@ export const ParseNotionProps: <T extends Record<string, any>>(
   const obj = Object.assign({}, config.default)
 
   for (const key in obj) {
-    if (obj[key]) {
+    if (obj.hasOwnProperty(key)) {
       const item = NotionProps[key]
       const props: { [key: string]: any } = {}
       if (config.bases && config.bases[key] !== undefined) props.base = config.bases[key]

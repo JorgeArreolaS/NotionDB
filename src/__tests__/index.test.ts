@@ -8,7 +8,7 @@ test('Test users', async () => {
   const token = process.env.DEV_NOTION_TOKEN
   if (!token) return
 
-  const notion = new NotionDatabase(token)
+  let notion = new NotionDatabase(token)
 
   interface User {
     emoji: string

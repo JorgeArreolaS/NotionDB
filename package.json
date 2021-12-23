@@ -8,6 +8,8 @@
     "test": "jest --config jestconfig.json",
     "tests": "nodemon -e .ts --exec 'clear && npm run test'",
     "lint": "tslint -p tsconfig.json --config .eslintrc.json",
+    "fix": "tslint --fix -p tsconfig.json --config .eslintrc.json",
+    "dev": "nodemon -e .ts --exec 'clear && npm run fix && npm run test && npm run lint'",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
