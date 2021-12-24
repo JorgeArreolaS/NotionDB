@@ -1,2 +1,2 @@
-import { NotionDatabase } from 'NotionDatabase';
+import { NotionDatabase } from './NotionDatabase';
 export { NotionDatabase };

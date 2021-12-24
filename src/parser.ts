@@ -1,17 +1,9 @@
-export type Tag = {
-  name: string
-  color?: string
-  id?: string
-}
-// import {
-//   QueryDatabaseParameters,
-//   QueryDatabaseResponse,
-// } from '@notionhq/client/build/src/api-endpoints';
+import {
+  // QueryDatabaseParameters,
+  QueryDatabaseResponse,
+} from '@notionhq/client/build/src/api-endpoints'
 
-type Property<T> = {
-  type: T
-  [x: string]: any
-}
+let a = 'a'
 
 type NotionPropType =
   | 'title'
@@ -34,29 +26,49 @@ type NotionPropType =
   | 'last_edited_by'
   | 'rollup'
 
-const relationParser: <T>(x: Property<'relation'>, props: { base: Record<string, T> }) => T[] = (x, { base }) => {
-  return (x && base ? x.relation.map((item: { id: string }) => base[item.id] || undefined) : x.relation) || []
+type resultType = QueryDatabaseResponse['results'][number]
+type pageType = Extract<resultType, { properties: any }>
+type properties = pageType['properties'][string]
+export type Property<T extends NotionPropType> = Extract<properties, { type: T }>
+
+export type Tag<T extends string = string> = {
+  name: T
+  color?: string
+  id?: string
 }
-export const NotionParserBase: {
-  [key: string]: any
-} = {
-  title: (x: Property<'title'>): string => (x && x.title.map((word: any) => word.text.content).join('')) || '',
+export type Tags<T extends string> = Tag<T>[]
 
-  rich_text: (x: Property<'rich_text'>): string => (x && x.rich_text.map((s: any) => s.plain_text).join('')) || '',
+const title = (x: Property<'title'>): string => (x && x.title.map((word: any) => word.plain_text).join('')) || ''
 
-  select: (x: Property<'select'>): Tag | undefined =>
-    (x && x.select && { name: x.select.name, color: x.select.color }) || undefined,
+const rich_text = (x: Property<'rich_text'>): string => (x && x.rich_text.map((s: any) => s.plain_text).join('')) || ''
 
-  date: (x: Property<'date'>): { start: Date; end: Date | undefined } | undefined =>
+const select = (x: Property<'select'>): Tag | undefined =>
+  (x && x.select && { name: x.select.name, color: x.select.color }) || undefined
+
+const date = (x: Property<'date'>): { start: Date; end: Date | undefined } | undefined => {
+  return (
     (x &&
       x.date &&
       x.date.start && {
         start: new Date(x.date.start),
         end: (x.date.end && new Date(x.date.end)) || undefined,
       }) ||
-    undefined,
+    undefined
+  )
+}
 
-  relation: relationParser,
+const relation: <T>(x: Property<'relation'>, props: { base: Record<string, T> }) => T[] = (x, { base }) => {
+  return (x && base && x.relation.map((item: { id: string }) => base[item.id])) || []
+}
+
+export const NotionParserBase: {
+  [key in NotionPropType]?: any
+} = {
+  title,
+  rich_text,
+  select,
+  date,
+  relation,
 }
 
 type NotionProp = {
