@@ -11,11 +11,13 @@ export class Database<T> {
     this.client = client
     this.template = template
   }
-  get: () => Promise<T[]> = async () => {
+  get: (config?: { bases?: Record<string, any> }) => Promise<T[]> = async (config) => {
     const res = await this.client.databases.query({
       database_id: this.id,
     })
     const items = res.results
+
+    // const { bases } = props || {}
 
     const results = items.map((item): T => {
       const _default = this.template as Record<string, any>
@@ -34,7 +36,7 @@ export class Database<T> {
           _default['id'] = item.id
 
       return ParseNotionProps<T>(item.properties, {
-        // ...config,
+        ...config,
         default: _default as T,
       })
     })

@@ -3,8 +3,6 @@ import {
   QueryDatabaseResponse,
 } from '@notionhq/client/build/src/api-endpoints'
 
-let a = 'a'
-
 type NotionPropType =
   | 'title'
   | 'rich_text'
@@ -57,12 +55,23 @@ const date = (x: Property<'date'>): { start: Date; end: Date | undefined } | und
   )
 }
 
+export const getBase = <T>(list: T[], key: string = 'id'): Record<string, T> => {
+  // if (list == undefined) return {};
+  let base: Record<string, T> = {}
+  // console.log(typeof list, list);
+
+  list.forEach((item: any) => {
+    if (item[key]) base[item[key]] = item
+  })
+  return base
+}
+
 const relation: <T>(x: Property<'relation'>, props: { base: Record<string, T> }) => T[] = (x, { base }) => {
   return (x && base && x.relation.map((item: { id: string }) => base[item.id])) || []
 }
 
 export const NotionParserBase: {
-  [key in NotionPropType]?: any
+  [key in NotionPropType]?: (...args: any[]) => any
 } = {
   title,
   rich_text,
@@ -86,7 +95,11 @@ export const NotionParser: <K = undefined>(
 
   const _type = property.type
   const _default = props?.default || undefined
-  if (_type in NotionParserBase && NotionParserBase[_type]) return NotionParserBase[_type](property, props) || _default
+  if (_type in NotionParserBase && typeof NotionParserBase[_type] !== 'undefined') {
+    const func = NotionParserBase[_type]
+    if (func === undefined) return _default
+    return func(property, props)
+  }
   return _default
 }
 
@@ -94,16 +107,25 @@ export const ParseNotionProps: <T extends Record<string, any>>(
   NotionProps: Record<string, NotionProp>,
   config: {
     default: T
-    bases?: Record<string, any>
+    bases?: Record<string, any | any[]>
   },
 ) => T = (NotionProps, config) => {
   const obj = Object.assign({}, config.default)
+
+  for (const key in config.bases) {
+    if (!config.bases.hasOwnProperty(key)) break
+    if (config.bases[key].hasOwnProperty('length')) {
+      config.bases[key] = getBase(config.bases[key])
+    }
+  }
 
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const item = NotionProps[key]
       const props: { [key: string]: any } = {}
-      if (config.bases && config.bases[key] !== undefined) props.base = config.bases[key]
+      if (config.bases && config.bases[key] !== undefined) {
+        props.base = config.bases[key]
+      }
       const value = NotionParser(item, { default: obj[key], ...props })
       if (value !== null || value !== undefined) obj[key] = value
     }
