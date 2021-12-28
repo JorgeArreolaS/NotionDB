@@ -26,8 +26,8 @@ type NotionPropType =
 
 type resultType = QueryDatabaseResponse['results'][number]
 type pageType = Extract<resultType, { properties: any }>
-type properties = pageType['properties'][string]
-export type Property<T extends NotionPropType> = Extract<properties, { type: T }>
+type NotionPropertiesType = pageType['properties'][string]
+export type Property<T extends NotionPropType> = Extract<NotionPropertiesType, { type: T }>
 
 export type Tag<T extends string = string> = {
   name: T
@@ -84,13 +84,14 @@ type NotionProp = {
   type: NotionPropType
   [key: string]: any
 }
-export const NotionParser: <K = undefined>(
+export const NotionParser: (
   property: NotionProp,
   props?: {
-    default?: K
+    default?: NotionPropertiesType
+    bases?: Record<string, any>
     [key: string]: any
   },
-) => K = (property, props) => {
+) => NotionPropertiesType = (property, props) => {
   if (typeof property !== 'object') return props?.default || undefined
 
   const _type = property.type
@@ -104,13 +105,14 @@ export const NotionParser: <K = undefined>(
 }
 
 export const ParseNotionProps: <T extends Record<string, any>>(
-  NotionProps: Record<string, NotionProp>,
+  NotionProps: Record<string, NotionPropertiesType>,
   config: {
     default: T
     bases?: Record<string, any | any[]>
   },
 ) => T = (NotionProps, config) => {
-  const obj = Object.assign({}, config.default)
+  type T = typeof config.default
+  const obj = Object.assign({}, config.default) as T
 
   for (const key in config.bases) {
     if (!config.bases.hasOwnProperty(key)) break
@@ -122,12 +124,15 @@ export const ParseNotionProps: <T extends Record<string, any>>(
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const item = NotionProps[key]
-      const props: { [key: string]: any } = {}
+      const _default = obj[key] as NotionPropertiesType
+      const props: Parameters<typeof NotionParser>[1] = {
+        default: _default,
+      }
       if (config.bases && config.bases[key] !== undefined) {
         props.base = config.bases[key]
       }
-      const value = NotionParser(item, { default: obj[key], ...props })
-      if (value !== null || value !== undefined) obj[key] = value
+      const value = NotionParser(item, props)
+      if (value !== null || value !== undefined) (obj[key] as NotionPropertiesType) = value
     }
   }
 
