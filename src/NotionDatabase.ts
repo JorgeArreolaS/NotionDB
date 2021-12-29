@@ -12,7 +12,7 @@ export class NotionDatabase {
       auth: token,
     })
   }
-  database = <T>(id: string, template: T, config?: filteredConfig) => {
-    return new Database(id, template, { client: this.client, ...config })
+  database = <T>(id: string, template: T, _config?: filteredConfig) => {
+    return new Database(id, template, { client: this.client, ..._config })
   }
 }

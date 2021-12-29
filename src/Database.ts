@@ -28,15 +28,15 @@ export class Database<T extends Record<string, any>> {
 
     if (ListOfBases !== undefined) {
       for (const key in ListOfBases) {
-        if (!ListOfBases.hasOwnProperty(key)) break
-
-        if (ListOfBases[key]?.hasOwnProperty('id')) {
-          const database = ListOfBases[key] as Database<any>
-          const payload = await database.get()
-          bases[key] = getBase(payload)
-        } else if (ListOfBases[key]?.hasOwnProperty('length')) {
-          let payload = ListOfBases[key] as any[]
-          bases[key] = getBase(payload)
+        if (ListOfBases.hasOwnProperty(key)) {
+          if (ListOfBases[key]?.hasOwnProperty('id')) {
+            const database = ListOfBases[key] as Database<any>
+            const payload = await database.get()
+            bases[key] = getBase(payload)
+          } else if (ListOfBases[key]?.hasOwnProperty('length')) {
+            const payload = ListOfBases[key] as any[]
+            bases[key] = getBase(payload)
+          }
         }
       }
     }
@@ -59,7 +59,7 @@ export class Database<T extends Record<string, any>> {
 
       return ParseNotionProps<T>(item.properties, {
         default: _default as T,
-        bases: bases,
+        bases,
       })
     })
     return results

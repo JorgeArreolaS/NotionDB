@@ -58,7 +58,7 @@ const date = (x: Property<'date'>): { start: Date; end: Date | undefined } | und
 
 export const getBase = <T>(list: T[], key: string = 'id'): Record<string, T> => {
   // if (list == undefined) return {};
-  let base: Record<string, T> = {}
+  const base: Record<string, T> = {}
   // console.log(typeof list, list);
 
   list.forEach((item: any) => {
