@@ -1,6 +1,10 @@
 import { Client } from '@notionhq/client'
 import { Database } from './Database'
 
+type DatabaseConstructorArgs = ConstructorParameters<typeof Database>
+type config = DatabaseConstructorArgs[2]
+type filteredConfig = Omit<config, 'client'>
+
 export class NotionDatabase {
   private client: Client
   constructor(token: string) {
@@ -8,7 +12,7 @@ export class NotionDatabase {
       auth: token,
     })
   }
-  database = <T>(id: string, template: T) => {
-    return new Database(id, template, this.client)
+  database = <T>(id: string, template: T, config?: filteredConfig) => {
+    return new Database(id, template, { client: this.client, ...config })
   }
 }

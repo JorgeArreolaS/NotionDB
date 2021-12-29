@@ -2,6 +2,7 @@ import {
   // QueryDatabaseParameters,
   QueryDatabaseResponse,
 } from '@notionhq/client/build/src/api-endpoints'
+import { Database } from 'Database'
 
 type NotionPropType =
   | 'title'
@@ -33,7 +34,7 @@ export type Tag<T extends string = string> = {
   name: T
   color?: string
   id?: string
-}
+} | null
 export type Tags<T extends string> = Tag<T>[]
 
 const title = (x: Property<'title'>): string => (x && x.title.map((word: any) => word.plain_text).join('')) || ''
@@ -108,18 +109,11 @@ export const ParseNotionProps: <T extends Record<string, any>>(
   NotionProps: Record<string, NotionPropertiesType>,
   config: {
     default: T
-    bases?: Record<string, any | any[]>
+    bases?: Record<string, Record<string, any[]>>
   },
 ) => T = (NotionProps, config) => {
   type T = typeof config.default
   const obj = Object.assign({}, config.default) as T
-
-  for (const key in config.bases) {
-    if (!config.bases.hasOwnProperty(key)) break
-    if (config.bases[key].hasOwnProperty('length')) {
-      config.bases[key] = getBase(config.bases[key])
-    }
-  }
 
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {

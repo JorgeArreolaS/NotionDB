@@ -20,13 +20,13 @@ describe('General tests', () => {
     const db = notion.database(test_users_db_id, <User>{
       emoji: '',
       name: '',
-      hobby: {},
+      hobby: null,
     })
     const users = await db.get()
 
     expect(users[1].name).toBe('jorge')
     expect(users[0].name).toBe('liz')
-    expect(users[1].hobby.name).toBe('programación')
-    expect(users[0].hobby.name).toBe('repostería')
+    expect(users[1].hobby?.name).toBe('programación')
+    expect(users[0].hobby?.name).toBe('repostería')
   })
 })
