@@ -1,8 +1,17 @@
 import { Client } from '@notionhq/client'
 import { getBase, ParseNotionProps } from './parser'
 
-type Base = Record<string, any>
+export type Base = Record<string, any>
 type Bases<T> = { [key in keyof T]?: Base[] | Database<any> }
+
+export type Relation<T extends Base> = Database<T> | undefined[]
+
+// type Filter<T extends Base, K extends keyof T> = Pick<T, K>
+// type test2 = Filter<test, 'age'>
+
+type TransformRecord<T extends Base> = {
+  [x in keyof T]: T[x] extends Relation<infer Q> ? Q[] : T[x]
+}
 
 export class Database<T extends Record<string, any>> {
   id: string
@@ -16,7 +25,12 @@ export class Database<T extends Record<string, any>> {
     this.template = template
     if (config.bases) this.bases = config.bases
   }
-  get: (config?: { bases?: Bases<T> }) => Promise<T[]> = async (config) => {
+  get: <K extends keyof T>(config?: {
+    bases?: Bases<T>
+    keys?: K[]
+  }) => Exclude<typeof config, undefined>['keys'] extends undefined
+    ? Promise<TransformRecord<T>[]>
+    : Promise<Pick<TransformRecord<T>, K>[]> = async (config) => {
     // console.log('Quering Database: ' + this.id)
     const res = await this.client.databases.query({
       database_id: this.id,
@@ -42,7 +56,15 @@ export class Database<T extends Record<string, any>> {
     }
 
     const results = items.map((item): T => {
-      const _default = this.template as Record<string, any>
+      let _default = this.template as Record<string, any>
+      if (config?.keys) {
+        const tempDefault: Record<string, any> = {}
+        for (const key of config.keys) {
+          tempDefault[key as string] = _default[key as string]
+        }
+        _default = tempDefault
+      }
+
       if (!('properties' in item)) return this.template
 
       // prettier-ignore
@@ -62,6 +84,6 @@ export class Database<T extends Record<string, any>> {
         bases,
       })
     })
-    return results
+    return results as any
   }
 }

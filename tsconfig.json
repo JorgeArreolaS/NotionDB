@@ -3,9 +3,12 @@
     "baseUrl": "src",
     "target": "es6",
     "module": "commonjs",
+    "sourceMap": true,
     "declaration": true,
     "outDir": "./lib",
-    "strict": true
+    "strict": true,
+    "lib": ["es6"],
+    "moduleResolution": "node"
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/__tests__/*"]

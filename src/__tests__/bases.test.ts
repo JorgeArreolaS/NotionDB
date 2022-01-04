@@ -1,13 +1,13 @@
-import { Property, Tag, Tags } from '../parser'
-import * as util from 'util'
-import { NotionDatabase } from '../index'
+import { Tag, Tags } from '../parser'
+// import * as util from 'util'
+import { NotionDatabase, Relation } from '../index'
 
 interface Pet {
   id: string
   name: string
   colors: Tags<'orange' | 'white' | 'black' | 'gray'>
-  users: User[]
-  toys: Toy[]
+  users: Relation<User>
+  toys: Relation<Toy>
 }
 const default_pet: Pet = {
   id: '',
@@ -17,13 +17,14 @@ const default_pet: Pet = {
   toys: [],
 }
 
-interface User {
+type User = {
   id: string
   emoji: string
   name: string
   hobby: Tag
-  pets: Pet[]
+  pets: Relation<Pet>
 }
+
 const default_user: User = {
   id: '',
   emoji: '',
@@ -76,7 +77,6 @@ describe('Parser bases tests', () => {
     if (!liz) throw Error('"Liz" user not found')
     expect(pets).toContainEqual(liz.pets[0])
     expect(pets).toContainEqual(liz.pets[1])
-
     const tom = pets.find((pet) => pet.name === 'tom')
     if (!tom) throw Error('"Tom" pet not found')
     expect(liz.pets).not.toContain(tom)
@@ -97,5 +97,13 @@ describe('Parser bases tests', () => {
     const tom = pets.find((pet) => pet.name === 'tom')
     if (!tom) throw Error('"Tom" pet not found')
     expect(liz.pets).not.toContain(tom)
+  })
+
+  test('Keys tests', async () => {
+    const users = await users_db.get({ keys: ['name', 'emoji', 'pets'] })
+
+    const firstUser = users[0]
+    const properties = Object.getOwnPropertyNames(firstUser)
+    expect(properties).toEqual(['name', 'emoji', 'pets'])
   })
 })

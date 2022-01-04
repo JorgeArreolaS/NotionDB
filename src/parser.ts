@@ -2,7 +2,6 @@ import {
   // QueryDatabaseParameters,
   QueryDatabaseResponse,
 } from '@notionhq/client/build/src/api-endpoints'
-import { Database } from 'Database'
 
 type NotionPropType =
   | 'title'
