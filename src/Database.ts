@@ -6,9 +6,6 @@ type Bases<T> = { [key in keyof T]?: Base[] | Database<any> }
 
 export type Relation<T extends Base> = Database<T> | undefined[]
 
-// type Filter<T extends Base, K extends keyof T> = Pick<T, K>
-// type test2 = Filter<test, 'age'>
-
 type TransformRecord<T extends Base> = {
   [x in keyof T]: T[x] extends Relation<infer Q> ? Q[] : T[x]
 }
