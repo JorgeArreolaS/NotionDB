@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "baseUrl": "src",
     "target": "es6",
     "module": "commonjs",

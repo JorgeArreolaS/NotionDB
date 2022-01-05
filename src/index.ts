@@ -1,11 +1,12 @@
 import { Client } from '@notionhq/client'
-import { Database, Relation } from './Database'
+import { Tag, Tags } from './parser'
+import { Database, Relation, TransformRecord } from './Database'
+
+export { Relation, Tag, Tags }
 
 type DatabaseConstructorArgs = ConstructorParameters<typeof Database>
 type config = DatabaseConstructorArgs[2]
 type filteredConfig = Omit<config, 'client'>
-
-export { Relation }
 
 export class NotionDatabase {
   private client: Client
@@ -14,11 +15,12 @@ export class NotionDatabase {
       auth: token,
     })
   }
-  database: <T extends Record<string, any>>(id: string, template: T, _config?: filteredConfig) => Database<T> = (
-    id,
-    template,
-    _config,
-  ) => {
-    return new Database<typeof template>(id, template, { client: this.client, ..._config })
+  database: <T extends Record<string, any>>(
+    id: string,
+    template: TransformRecord<T>,
+    _config?: filteredConfig,
+    dummy?: T,
+  ) => Database<T> = (id, template, _config, dummy) => {
+    return new Database<Omit<typeof dummy, 'undefined'>>(id, template, { client: this.client, ..._config })
   }
 }
